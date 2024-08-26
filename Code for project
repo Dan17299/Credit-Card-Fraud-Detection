@@ -1,0 +1,24 @@
+import pandas as pd
+from sklearn.preprocessing import StandardScaler
+from sklearn.model_selection import train_test_split
+from sklearn.linear_model import LogisticRegression
+from sklearn.metrics import accuracy_score
+from sklearn.metrics import classification_report
+df = pd.read_csv(r"C:\Users\Daniel\Documents\creditcard.csv")
+x = df.drop(['Class', 'Time'], axis = 1)
+y = df.Class
+scalar = StandardScaler()
+x_scaled = scalar.fit_transform(x)
+x_train, x_test, y_train, y_test = train_test_split(x_scaled, y, test_size = 0.2, random_state = 1234)
+log_reg = LogisticRegression(max_iter = 10000)
+log_reg.fit(x_train, y_train)
+y_pred = log_reg.predict(x_test)
+print(f"The classification report is: {classification_report(y_test, y_pred)}")
+x_test_df = pd.DataFrame(scalar.inverse_transform(x_test), columns = df.columns.drop(["Class", "Time"]))
+y_pred_df= pd.DataFrame(y_pred, columns = ["Class"])
+df_pred = pd.concat([x_test_df, y_pred_df], axis = 1)
+df_pred = df_pred[df_pred["Class"] == 1]
+print(df_pred.head())
+
+
+
